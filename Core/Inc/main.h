@@ -59,14 +59,12 @@ void Error_Handler(void);
 /* Private defines -----------------------------------------------------------*/
 #define Temperatura_LM35_Pin GPIO_PIN_3
 #define Temperatura_LM35_GPIO_Port GPIOC
-#define Tensiune_Pin GPIO_PIN_1
-#define Tensiune_GPIO_Port GPIOA
-#define Curent_ACS712_Pin GPIO_PIN_2
-#define Curent_ACS712_GPIO_Port GPIOA
 #define Fum_MQ_2_Pin GPIO_PIN_3
 #define Fum_MQ_2_GPIO_Port GPIOA
-#define BUZZER_Pin GPIO_PIN_11
-#define BUZZER_GPIO_Port GPIOD
+#define CURENT_Pin GPIO_PIN_5
+#define CURENT_GPIO_Port GPIOA
+#define TENSIUNE_Pin GPIO_PIN_1
+#define TENSIUNE_GPIO_Port GPIOB
 #define RELAY_MAIN_Pin GPIO_PIN_2
 #define RELAY_MAIN_GPIO_Port GPIOG
 #define RELAY_LIGHT_Pin GPIO_PIN_3
@@ -75,6 +73,8 @@ void Error_Handler(void);
 #define USART6RX_ESP32_GPIO_Port GPIOC
 #define USART6TX_ESP32_Pin GPIO_PIN_7
 #define USART6TX_ESP32_GPIO_Port GPIOC
+#define BUZZER_Pin GPIO_PIN_9
+#define BUZZER_GPIO_Port GPIOG
 
 /* USER CODE BEGIN Private defines */
 

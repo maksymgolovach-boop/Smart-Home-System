@@ -5,12 +5,12 @@
   *          Placa: STM32F429I-DISC1 (STM32F429ZIT6), STM32 HAL
   *
   *  ADC1 (scan, 4 canale, 12 biti, DMA circular -> adc_dma_buf[4]):
-  *    Rank 1  PA1  ADC1_IN1   Tensiune retea (divizor 10k / 2.2k)
-  *    Rank 2  PA2  ADC1_IN2   Curent ACS712-05B (divizor 10k / 20k)
+  *    Rank 1  PB1  ADC1_IN9   Tensiune retea (divizor 10k / 2.2k)
+  *    Rank 2  PA5  ADC1_IN5   Curent ACS712-05B (divizor 10k / 20k)
   *    Rank 3  PA3  ADC1_IN3   Fum/gaz MQ-2 (divizor 10k / 20k)
   *    Rank 4  PC3  ADC1_IN13  Temperatura LM35
   *
-  *  GPIO:  PG2 = RELAY_MAIN, PG3 = RELAY_LIGHT (avarie), PD11 = BUZZER
+  *  GPIO:  PG2 = RELAY_MAIN, PG3 = RELAY_LIGHT (avarie), PG9 = BUZZER
   *  UART6: PC6 = TX, PC7 = RX, 115200 8N1
   *
   *  Utilizare in main.c:
@@ -38,17 +38,17 @@ extern "C" {
 #ifndef LIGHT_ACTIVE_LOW
 #define LIGHT_ACTIVE_LOW            RELAY_ACTIVE_LOW
 #endif
-/* 1 = buzzer activ cu nivel HIGH pe PD11 */
+/* 1 = buzzer activ cu nivel HIGH pe PG9 */
 #ifndef BUZZER_ACTIVE_HIGH
 #define BUZZER_ACTIVE_HIGH          1
 #endif
 
 /* ============================ Configurare ADC ============================== */
 #define ADC_CH_COUNT                4U
-#define ADC_IDX_VOLTAGE             0U      /* Rank 1 - PA1 */
-#define ADC_IDX_CURRENT             1U      /* Rank 2 - PA2 */
-#define ADC_IDX_SMOKE               2U      /* Rank 3 - PA3 */
-#define ADC_IDX_TEMP                3U      /* Rank 4 - PC3 */
+#define ADC_IDX_VOLTAGE             0U      /* Rank 1 - PB1 (ADC1_IN9) */
+#define ADC_IDX_CURRENT             1U      /* Rank 2 - PA5 (ADC1_IN5) */
+#define ADC_IDX_SMOKE               2U      /* Rank 3 - PA3 (ADC1_IN3) */
+#define ADC_IDX_TEMP                3U      /* Rank 4 - PC3 (ADC1_IN13) */
 
 #define ADC_VREF_V                  3.3f
 #define ADC_FULL_SCALE              4095.0f

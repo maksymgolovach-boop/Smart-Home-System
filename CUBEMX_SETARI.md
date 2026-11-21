@@ -14,7 +14,7 @@ Legendă: ✅ = deja setat corect în `Sistem_SmartHome.ioc` · ⚠️ = de modi
 
 ## 2. ADC1 (Analog → ADC1)
 
-Canale bifate: **IN1 (PA1), IN2 (PA2), IN3 (PA3), IN13 (PC3)**
+Canale bifate: **IN9 (PB1 – `TENSIUNE`), IN5 (PA5 – `CURENT`), IN3 (PA3 – `Fum MQ-2`), IN13 (PC3 – `Temperatura LM35`)**
 
 | Parametru | Valoare | Stare |
 |---|---|---|
@@ -28,8 +28,8 @@ Canale bifate: **IN1 (PA1), IN2 (PA2), IN3 (PA3), IN13 (PC3)**
 | End Of Conversion Selection | EOC flag at the end of single channel conversion | ✅ |
 | Number Of Conversion | 4 | ✅ |
 | External Trigger Conversion Source | Regular Conversion launched by software | ✅ |
-| Rank 1 | Channel 1, 84 Cycles | ✅ |
-| Rank 2 | Channel 2, 84 Cycles | ✅ |
+| Rank 1 | **Channel 9** (PB1, tensiune), 84 Cycles | ✅ |
+| Rank 2 | **Channel 5** (PA5, curent), 84 Cycles | ✅ |
 | Rank 3 | Channel 3, 84 Cycles | ✅ |
 | Rank 4 | Channel 13, 84 Cycles | ✅ |
 
@@ -62,22 +62,23 @@ Increment Address: Memory ✔ / Peripheral ✘, Data Width: **Half Word / Half W
 
 | Pin | User Label | Mode | Pull | Speed | GPIO output level | Stare |
 |---|---|---|---|---|---|---|
-| PD11 | `BUZZER` | Output Push Pull | No pull | Low | Low | ✅ |
-| PG2 | `RELAY_MAIN` | Output Push Pull | No pull | Low | **High** (cu `RELAY_ACTIVE_LOW 1`) | ⚠️ acum e Low |
-| PG3 | `RELAY_LIGHT` | Output Push Pull | No pull | Low | **High** (cu `RELAY_ACTIVE_LOW 1`) | ⚠️ acum e Low |
+| PG2 | `RELAY_MAIN` | Output Push Pull | No pull | Low | **High** (releu decuplat, `RELAY_ACTIVE_LOW 1`) | ✅ |
+| PG3 | `RELAY_LIGHT` | Output Push Pull | No pull | Low | **High** (releu decuplat) | ✅ |
+| PG9 | `BUZZER` | Output Push Pull | No pull | Low | **Low** (buzzer oprit, `BUZZER_ACTIVE_HIGH 1`) | ✅ |
 
-> Cu modul de relee activ pe LOW, nivelul inițial Low anclanșează releele pentru câteva microsecunde,
-> între `MX_GPIO_Init()` și `App_Safety_Init()`. Setează **High** ca releele să rămână decuplate de la reset.
+> Nivelul inițial trebuie să însemne mereu „oprit”: High pentru releele active pe LOW, Low pentru buzzerul activ pe HIGH.
+> Dacă schimbi polaritatea în `app_safety.h`, schimbă și *GPIO output level* aici.
+> PA1, PA2 și PD11 nu mai sunt folosite (Reset_State).
 > Etichetele (User Label) trebuie păstrate exact, pentru că `app_safety.c` folosește `RELAY_MAIN_Pin`, `RELAY_LIGHT_Pin` și `BUZZER_Pin` din `main.h`.
 
 ## 6. Project Manager
 
 | Setare | Valoare | Stare |
 |---|---|---|
-| Toolchain / IDE | CMake | ✅ |
+| Toolchain / IDE | STM32CubeIDE (proiect CubeIDE 2.x bazat pe CMake) | ✅ |
 | Code Generator → Generate peripheral initialization as a pair of '.c/.h' files | ✔ | ✅ |
-| Linker Settings → Minimum Heap Size | **0x400** (pentru `snprintf` cu `%f`) | ⚠️ acum 0x200 |
-| Linker Settings → Minimum Stack Size | **0x800** | ⚠️ acum 0x400 |
+| Linker Settings → Minimum Heap Size | 0x200 – suficient: `_sbrk` din `sysmem.c` permite heap-ului să crească până la zona de stivă | ✅ |
+| Linker Settings → Minimum Stack Size | 0x400 – suficient (stiva maximă estimată ≈ 0.6 KB, din fișierele `.su`) | ✅ |
 
 ## 7. Suport float în `snprintf` (`-u _printf_float`)
 
@@ -112,17 +113,20 @@ Increment Address: Memory ✔ / Peripheral ✘, Data Width: **Half Word / Half W
 
 `HAL_UART_RxCpltCallback` și `HAL_UART_ErrorCallback` sunt definite în `app_safety.c`. Nu le defini și în alt fișier.
 
-## 9. ⚠️ Conflicte de pini pe STM32F429I-DISC1 (UM1670)
+## 9. Pini partajați pe STM32F429I-DISC1 (UM1670)
+
+Pinout v2: tensiunea a fost mutată de pe PA1 pe **PB1**, curentul de pe PA2 pe **PA5**, buzzerul de pe PD11 pe **PG9**.
+Motivul: PA1/PA2 sunt legate pe placă la ieșirile INT1/INT2 ale giroscopului, iar PD11 la ieșirea TE a LCD-ului.
 
 | Pin | Conectat pe placă la | Efect |
 |---|---|---|
-| **PA1** (Tensiune) | giroscop INT1 (L3GD20 / I3G4250D) | Ieșirea giroscopului forțează pinul → citire ADC eronată |
-| **PA2** (Curent) | giroscop INT2 | la fel – afectează direct protecțiile de curent |
-| **PD11** (Buzzer) | LCD TE (ieșire a controlerului LCD) | două ieșiri pe același fir |
-| PA3 (Fum) | LCD B5 (intrare LCD) | de regulă acceptabil |
-| PC6 / PC7 (UART6) | LCD HSYNC / G6 (intrări LCD) | funcționează; LCD-ul poate afișa artefacte |
+| PA5 (Curent), PC3 (Temp), PG2, PG3, PG9 | nimic (pini liberi) | ✅ fără conflict |
+| PB1 (Tensiune) | LCD R6 (intrare LCD) | ✅ acceptabil cât timp LCD-ul nu e folosit cu LTDC |
+| PA3 (Fum) | LCD B5 (intrare LCD) | ✅ acceptabil cât timp LCD-ul nu e folosit cu LTDC |
+| PC6 / PC7 (UART6) | LCD HSYNC / G6 (intrări LCD) | ✅ funcționează; LCD-ul poate afișa artefacte |
 
-Pini fără funcție pe placă în UM1670 (de verificat în tabelul din manual înainte de mutare): PA5 (ADC1_IN5), PC3, PG2, PG3, PF6.
+Dacă vei afișa ceva pe LCD, PA3, PB1, PC6 și PC7 trebuie mutați.
+Singurul pin analogic complet liber rămas este PF6 (doar ADC3, necesită modificare de cod).
 Dacă muți un canal ADC, păstrează **ordinea rank-urilor** (1 = tensiune, 2 = curent, 3 = fum, 4 = temperatură). Codul nu depinde de pin, doar de rank.
 
 ## 10. Comportament implementat (rezumat)
