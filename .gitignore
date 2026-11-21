@@ -1,0 +1,30 @@
+# --- Build output (CMake / Ninja) ---
+build/
+out/
+Debug/
+Release/
+
+# --- Compiler / linker artifacts ---
+*.o
+*.obj
+*.d
+*.su
+*.cyclo
+*.elf
+*.bin
+*.hex
+*.map
+*.list
+compile_commands.json
+
+# --- IDE / editor local state ---
+.metadata/
+.settings/
+.vscode/
+.idea/
+*.launch
+
+# --- OS clutter ---
+Thumbs.db
+desktop.ini
+.DS_Store

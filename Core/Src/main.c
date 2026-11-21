@@ -25,6 +25,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "app_safety.h"
 
 /* USER CODE END Includes */
 
@@ -93,6 +94,7 @@ int main(void)
   MX_ADC1_Init();
   MX_USART6_UART_Init();
   /* USER CODE BEGIN 2 */
+  App_Safety_Init();   /* calibrare ACS712, pornire ADC+DMA, receptie UART */
 
   /* USER CODE END 2 */
 
@@ -103,6 +105,7 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+    App_Safety_Process(); /* non-blocant: senzori, protectii, protocol UART */
   }
   /* USER CODE END 3 */
 }
